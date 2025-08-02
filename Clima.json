@@ -1,0 +1,160 @@
+{
+  "name": "Clima",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 6
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -720,
+        -240
+      ],
+      "id": "d1d2c32f-9229-4533-8816-262a7c4d895e",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "cityName": "Rio de Janeiro, BR",
+        "language": "PT - BR"
+      },
+      "type": "n8n-nodes-base.openWeatherMap",
+      "typeVersion": 1,
+      "position": [
+        -432,
+        -240
+      ],
+      "id": "1069113f-61d7-4700-a837-3b09857cb6bc",
+      "name": "OpenWeatherMap",
+      "credentials": {
+        "openWeatherMapApi": {
+          "id": "vmspHcRk3RSxbQ9m",
+          "name": "OpenWeatherMap account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Atue como um meteorologista profissional. Me forneça a previsão do tempo detalhada para Rio de Janeiro, RJ para hoje e os próximos 3 dias. Inclua:\n\n1. Temperatura máxima e mínima\n2. Sensação térmica\n3. Probabilidade de chuva (em %)\n4. Velocidade e direção do vento\n5. Umidade do ar\n6. Índice UV\n7. Recomendação prática com base no clima (ex: levar guarda-chuva, usar protetor solar, evitar sair etc.)\n\nFale de forma clara e didática, como se estivesse apresentando em um telejornal. Atualize os dados com base na data de hoje (30/07/2025) e fale diretamente comigo como se você fosse um assistente de clima de confiança.\n",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        -176,
+        -240
+      ],
+      "id": "056df7fc-3e3e-4b06-b8b0-3d6572b0919a",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -176,
+        -16
+      ],
+      "id": "da712bab-fcda-4c77-b35f-7180d0d2c9d6",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "dixxfZcINbDdMwtW",
+          "name": "Groq account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "gabrielcruzsal@gmail.com",
+        "subject": "Bom dia! ",
+        "message": "=Atue como um meteorologista profissional. Me forneça a previsão do tempo detalhada para Rio de Janeiro, RJ para hoje e os próximos 3 dias. Inclua:  1. Temperatura máxima e mínima: {{ $json.main.temp_min }} 2. Sensação térmica: {{ $json.main.feels_like }} 4. Umidade do ar:{{ $json.main.humidity }} 5. Local: {{ $json.name }}  Fale de forma clara e didática, como se estivesse apresentando em um telejornal. Atualize os dados com base na data de hoje (30/07/2025) e fale diretamente comigo como se você fosse um assistente de clima de confiança. ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        224,
+        -240
+      ],
+      "id": "3fd83ec0-ea8c-4530-b67a-a2f904c14b74",
+      "name": "Send a message",
+      "webhookId": "de66f5b6-4264-4281-8549-734bed005eeb",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "rBZwJtin8HlcDgjL",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "OpenWeatherMap",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenWeatherMap": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "829d3a9e-fa2c-4d28-8f83-1b1d220fd02d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ba7d10a990a3c810f9b40c8260461747491ef3a724d7a629c82ca38982596413"
+  },
+  "id": "cYWHh3YctHqsulCx",
+  "tags": []
+}
